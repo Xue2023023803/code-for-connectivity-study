@@ -56,7 +56,7 @@ modelNames = { ...
     'B6_hierarchy', ...
     'B0_null'};
 
-PP_THRESH = 0.95;   % exploratory threshold (unified)
+PP_THRESH = 0.60;   % exploratory threshold (unified)
 
 % Which DCM parameter fields to take to PEB level (default: B only)
 field = {'B'};   % change to {'A','B'} if you want both
@@ -580,8 +580,13 @@ end
 % startsWith on cell can be version-dependent; use strncmp
 has_cond = any(cellfun(@(s) ischar(s) && strncmp(s,'cond:',5), Pnames));
 has_mean = any(cellfun(@(s) ischar(s) && strncmp(s,'mean:',5), Pnames));
-if is_cond && has_cond
-    prefix_mask = cellfun(@(s) ischar(s) && strncmp(s,'cond:',5), Pnames);
+if is_cond
+    % 对于condEffect，检查两类参数：mean和cond
+    mask_mean = cellfun(@(s) ischar(s) && strncmp(s,'mean:',5), Pnames);
+    mask_cond = cellfun(@(s) ischar(s) && strncmp(s,'cond:',5), Pnames);
+    
+    % 合并两类参数的mask
+    prefix_mask = mask_mean | mask_cond;
 elseif ~is_cond && has_mean
     prefix_mask = cellfun(@(s) ischar(s) && strncmp(s,'mean:',5), Pnames);
 end
